@@ -1,0 +1,66 @@
+#!/bin/bash
+MAX_LENGTH_TWEET=140;
+
+inputText=$1;
+
+lenghtText=${#inputText};
+
+lastPosition=-1;
+
+tweets=();
+
+#Define posicoes de um tweet
+definePositions(){
+	lengthChars=$MAX_LENGTH_TWEET;
+	firstPosition=$((lastPosition + 1));	
+	lastPosition=$((firstPosition + lengthChars - 1));
+	local lastChar=${inputText:$lastPosition:1};
+
+	while true; do
+	  if [ "$lastChar" == " " ] || [ "$lastPosition" -ge "$lenghtText" ]; then
+	    break
+	  fi
+	  lastPosition=$((lastPosition - 1));
+	  lastChar=${inputText:$lastPosition:1}
+	  lengthChars=$((lengthChars - 1));
+	done
+}
+
+#Adiciona o tweet no array de tweets
+createTweet(){
+	local tweet=${inputText:$firstPosition:$lengthChars};
+	tweets+=("$tweet")
+}
+
+#Trata o texto recebido
+handleText(){
+	if [ -z "$inputText" ]; then 
+		echo "O texto recebido é nulo."
+		exit 0;
+	fi
+	
+	while true; do
+	  definePositions;
+	  createTweet;
+	  if [ "$lastPosition" -ge "$lenghtText" ] ; then
+		    break
+	  fi
+	done	
+}
+
+#Imprime no console os tweets criados.
+printTweets(){
+	local count=0;
+	local total=${#tweets[@]}
+	for i in "${tweets[@]}"; 
+	do
+		count=$((count+1));
+		echo "----------------------------------------------------";
+		echo "Tweet" $count"/"$total
+		echo "$i"; 
+		echo -e "----------------------------------------------------\n";
+	done
+}
+
+handleText;
+printTweets;
